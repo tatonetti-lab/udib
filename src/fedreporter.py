@@ -45,7 +45,13 @@ def merge_funding_by_year(new, total):
 def fetch_grants(term, offset, limit):
     vars = {'query': 'text:%s$agency:nih$textFields:title,abstract' % term, 'offset': offset, 'limit': limit}
     full_uri = search_uri + urllib.urlencode(vars)
-    response = urllib2.urlopen(full_uri)
+    while True:
+        try:
+            response = urllib2.urlopen(full_uri)
+            break
+        except urllib2.HTTPError as http_error:
+            print >> sys.stderr, "Encountered error, will try again: %s" % http_error
+    
     json_data = response.read()
     data = json.loads(json_data)
     
