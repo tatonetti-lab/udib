@@ -1,0 +1,112 @@
+"""
+Query the Federal RePORTER API for the provided search terms.
+
+Docs for the API:
+https://api.federalreporter.nih.gov/
+
+@author Nicholas Tatonetti
+"""
+
+import os
+import sys
+import csv
+import json
+import tqdm
+import urllib
+import urllib2
+
+search_uri = 'https://api.federalreporter.nih.gov/v1/Projects/search?'
+
+def parse_funding_by_year(data):
+    
+    funding = dict()
+    for item in data['items']:
+        if not item['fy'] in funding:
+            funding[item['fy']] = {'cost': 0, 'count': 0}
+        
+        if item['totalCostAmount'] is None:
+            continue
+        
+        funding[item['fy']]['cost'] += int(item['totalCostAmount'])
+        funding[item['fy']]['count'] += 1
+    
+    return funding
+
+def merge_funding_by_year(new, total):
+    
+    for fy in new.keys():
+        if not fy in total:
+            total[fy] = {'cost': 0, 'count': 0}
+        total[fy]['cost'] += new[fy]['cost']
+        total[fy]['count'] += new[fy]['count']
+    
+    return total
+
+def fetch_grants(term, offset, limit):
+    vars = {'query': 'text:%s$agency:nih$textFields:title,abstract' % term, 'offset': offset, 'limit': limit}
+    full_uri = search_uri + urllib.urlencode(vars)
+    response = urllib2.urlopen(full_uri)
+    json_data = response.read()
+    data = json.loads(json_data)
+    
+    return data
+
+def query_funds_for_term(term, offset=1, limit=50, print_totals=True):
+    
+    if limit > 50:
+        raise Exception("Limit cannot be set higher than 50, was set to %s" % limit)
+    
+    data = fetch_grants(term, offset, limit)
+    totals = parse_funding_by_year(data)
+    offset += limit
+
+    for i in tqdm.tqdm(range(1,data['totalPages'])):
+        data = fetch_grants(term, offset, limit)
+        new = parse_funding_by_year(data)
+        totals = merge_funding_by_year(new, totals)
+        offset += limit
+        
+        
+    if print_totals:
+        print >> sys.stdout, "%s,%s,%s" % ('FiscalYear', 'TotalGrants', 'TotalFunding')
+        for fy in sorted(totals.keys()):
+            print >> sys.stdout, "%s,%d,%d" % (fy, totals[fy]['count'], totals[fy]['cost'])
+    
+    return totals
+
+def save_totals(totals, search_term, file_name = None):
+    
+    if file_name is None:
+        file_name = search_term.replace(' ', '_')
+    
+    ofn = 'data/funding/%s.csv' % file_name
+    ofh = open(ofn, 'w')
+    writer = csv.writer(ofh)
+    writer.writerow(['FiscalYear', 'TotalGrants', 'TotalFunding'])
+    for fy in sorted(totals.keys()):
+        writer.writerow([fy, totals[fy]['count'], totals[fy]['cost']])
+    ofh.close()
+
+if __name__ == "__main__":
+
+    if len(sys.argv) == 1:
+        print >> sys.stderr, "No disease terms provided. Runing with example: endometriosis"
+        search_term = 'endometriosis'
+    else:
+        search_term = ' '.join(sys.argv[1:])
+        print >> sys.stderr, "Collecting NIH funding amounts by year for: %s" % search_term
+    
+    ofn = 'data/funding/%s.csv' % search_term.replace(' ', '_')
+    if os.path.exists(ofn):
+        print >> sys.stderr, "Results file already exists at %s, quitting." % ofn
+        for line in open(ofn):
+            print line,
+        sys.exit(101)
+
+    totals = query_funds_for_term(search_term)
+    
+    save_totals(totals, search_term)
+    
+    
+    
+        

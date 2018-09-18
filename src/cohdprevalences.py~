@@ -1,0 +1,8 @@
+"""
+Query and store the EHR disease prevelances from the Columbia Open Health Data resource.
+
+COHD API:
+http://cohd.nsides.io
+
+
+"""
