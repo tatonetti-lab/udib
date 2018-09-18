@@ -38,7 +38,7 @@ for cond in data['results']:
     print >> sys.stderr, 'Concept Count: ', cond['concept_count']
     print >> sys.stderr, 'Concept Freq:  ', cond['concept_frequency']
     
-    search_term = cond['concept_name'].replace('(', ' ').replace(')', ' ')
+    search_term = cond['concept_name'].replace('(', ' ').replace(')', ' ').replace(',', '')
     
     totals = query_funds_for_term(search_term)
     save_totals(totals, search_term, file_name)
