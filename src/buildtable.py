@@ -56,6 +56,7 @@ for cond in data['results']:
     row = list()
     row.append(cond['concept_id'])
     row.append(cond['concept_name'])
+    row.append(cond['concept_count'])
     row.append(cond['concept_frequency'])
     row.append(count)
     row.append(cost)
