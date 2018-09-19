@@ -82,7 +82,7 @@ for cond, row in tabledatadict.items():
         sys.exit(101)
     
     tablerow = list()
-    tablerow.append( "%.2f" % udipScore )
+    tablerow.append( udipScore )
     tablerow.append( row['id'] )
     tablerow.append( row['name'] )
     tablerow.append( "{:,}".format(row['count']) )
@@ -97,6 +97,7 @@ tabledata = sorted(tabledata)
 tabledata.reverse()
 
 for row in tabledata:
+    row[0] = "%.2f" % row[0] # needed it as a float to sort
     print >> sys.stdout, mdtablerow(row)
     
     
