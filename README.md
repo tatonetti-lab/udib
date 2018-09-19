@@ -16,4 +16,8 @@ Please feel free to use and contribute to this resource. It is provided as a ser
 
 # Data Table
 
-...
+An initial (and incomplete) data table has been generated for High Level Terms:
+
+[Sep 19 2018](data/datatable/september_19_2018.md)
+
+
