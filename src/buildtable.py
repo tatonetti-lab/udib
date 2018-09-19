@@ -53,13 +53,13 @@ for cond in data['results']:
     
     total_cost += int(cost)
     
-    row = list()
-    row.append(cond['concept_id'])
-    row.append(cond['concept_name'])
-    row.append(cond['concept_count'])
-    row.append(cond['concept_frequency'])
-    row.append(count)
-    row.append(cost)
+    row = dict()
+    row['id'] = cond['concept_id']
+    row['name'] = cond['concept_name']
+    row['count'] = int(cond['concept_count'])
+    row['freq'] = float(cond['concept_frequency'])
+    row['grantnum'] = int(count)
+    row['grantcost'] = int(cost)
     
     tabledatadict[cond['concept_id']] = row
 
@@ -67,12 +67,12 @@ tabledata = list()
 
 for cond, row in tabledatadict.items():
     
-    if int(row[-1]) == 0:
+    if int(row['grantcost']) == 0:
         continue
     
     try:
-        pCost = float(row[-1])/float(total_cost)
-        udipScore = float(row[3])/pCost
+        pCost = float(row['grantcost'])/float(total_cost)
+        udipScore = float(row['freq'])/pCost
     except ZeroDivisionError:
         print >> sys.stderr, "Div by zero error for %s, %s" % (row, total_cost)
         sys.exit(100)
@@ -81,7 +81,16 @@ for cond, row in tabledatadict.items():
         print >> sys.stderr, row, total_cost
         sys.exit(101)
     
-    tabledata.append( [udipScore] + row + [pCost])
+    tablerow = list()
+    tablerow.append( udipScore )
+    tablerow.append( row['id'] )
+    tablerow.append( "{:,}".format(row['count']) )
+    tablerow.append( "%.2f" % row['freq'] )
+    tablerow.append( "{:,}".format(row['grantnum']) )
+    tablerow.append( "$" + "{:,}".format(row['grantcost']) )
+    tablerow.append( "%.5f" % pCost )
+    
+    tabledata.append( tablerow )
 
 tabledata = sorted(tabledata)
 tabledata.reverse()
