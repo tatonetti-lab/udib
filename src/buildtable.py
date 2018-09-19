@@ -84,6 +84,7 @@ for cond, row in tabledatadict.items():
     tablerow = list()
     tablerow.append( udipScore )
     tablerow.append( row['id'] )
+    tablerow.append( row['name'] )
     tablerow.append( "{:,}".format(row['count']) )
     tablerow.append( "%.2f" % row['freq'] )
     tablerow.append( "{:,}".format(row['grantnum']) )
