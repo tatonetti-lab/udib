@@ -27,7 +27,7 @@ data = json.loads(json_data)
 
 print >> sys.stderr, "Loaded %d conditions from URI." % len(data['results'])
 
-headers = ['udibScore', 'ID', 'Disease/Disease Category', 'Number of Patients', 'EHR Disease Frequency', 'Number of Grants', 'Funding Total', 'Funding pScore*']
+headers = ['udibScore', 'Disease/Disease Category', 'Number of Patients', 'EHR Disease Frequency', 'Number of Grants', 'Funding Total', 'Funding pScore*']
 
 print >> sys.stdout, mdtablerow(headers)
 print >> sys.stdout, mdtablerow(['---']*len(headers))
@@ -83,7 +83,7 @@ for cond, row in tabledatadict.items():
     
     tablerow = list()
     tablerow.append( udipScore )
-    tablerow.append( row['id'] )
+    # tablerow.append( row['id'] )
     tablerow.append( row['name'] )
     tablerow.append( "{:,}".format(row['count']) )
     tablerow.append( "%.2f" % row['freq'] )
