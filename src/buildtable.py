@@ -82,7 +82,7 @@ for cond, row in tabledatadict.items():
         sys.exit(101)
     
     tablerow = list()
-    tablerow.append( udipScore )
+    tablerow.append( "%.2f" % udipScore )
     tablerow.append( row['id'] )
     tablerow.append( row['name'] )
     tablerow.append( "{:,}".format(row['count']) )
