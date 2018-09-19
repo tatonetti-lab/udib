@@ -72,7 +72,7 @@ for cond, row in tabledatadict.items():
     
     try:
         pCost = float(row[-1])/float(total_cost)
-        udipScore = float(row[2])/pCost
+        udipScore = float(row[3])/pCost
     except ZeroDivisionError:
         print >> sys.stderr, "Div by zero error for %s, %s" % (row, total_cost)
         sys.exit(100)
