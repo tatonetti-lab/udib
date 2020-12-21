@@ -45,6 +45,7 @@ def merge_funding_by_year(new, total):
 def fetch_grants(term, offset, limit):
     vars = {'query': 'text:%s$agency:nih$textFields:title,abstract' % term, 'offset': offset, 'limit': limit}
     full_uri = search_uri + urllib.urlencode(vars)
+    #print full_uri
     while True:
         try:
             response = urllib2.urlopen(full_uri)
@@ -65,7 +66,7 @@ def query_funds_for_term(term, offset=1, limit=50, print_totals=True):
     data = fetch_grants(term, offset, limit)
     totals = parse_funding_by_year(data)
     offset += limit
-
+    
     for i in tqdm.tqdm(range(1,data['totalPages'])):
         data = fetch_grants(term, offset, limit)
         new = parse_funding_by_year(data)
@@ -95,9 +96,11 @@ def save_totals(totals, search_term, file_name = None):
 
 if __name__ == "__main__":
 
+    condition_id = None
+    
     if len(sys.argv) == 1:
-        print >> sys.stderr, "No disease terms provided. Runing with example: endometriosis"
-        search_term = 'endometriosis'
+        print >> sys.stderr, "No disease terms provided."
+        sys.exit(10)
     else:
         search_term = ' '.join(sys.argv[1:])
         print >> sys.stderr, "Collecting NIH funding amounts by year for: %s" % search_term
@@ -108,7 +111,7 @@ if __name__ == "__main__":
         for line in open(ofn):
             print line,
         sys.exit(101)
-
+    
     totals = query_funds_for_term(search_term)
     
     save_totals(totals, search_term)
